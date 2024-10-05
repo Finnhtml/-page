@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gespeicherte Einträge</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #121212; /* Dunkler Hintergrund */
+            color: #e0e0e0; /* Helle Schriftfarbe */
+            padding: 20px;
+        }
+
+        h1 {
+            color: #bb86fc; /* Helle lila Farbe */
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #1e1e1e; /* Dunkle Box für Inhalte */
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+
+        button {
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #444; /* Dunklerer Rahmen */
+            font-size: 16px;
+            background-color: #6200ee; /* Dunkles Blau */
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #3700b3; /* Dunkleres Blau beim Hover */
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #292929; /* Dunkle Hintergrundfarbe für Einträge */
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #444; /* Dunklerer Rahmen */
+            transition: transform 0.2s;
+        }
+
+        li:hover {
+            transform: scale(1.02);
+            border-color: #bb86fc; /* Lila beim Hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gespeicherte Einträge</h1>
+        <button id="exportToExcel">Exportiere nach Excel</button>
+        <button id="backToIndex">Zurück zur Eingabe</button>
+
+        <h2>Einträge:</h2>
+        <ul id="entryList"></ul>
+    </div>
+
+    <script>
+        let entries = JSON.parse(localStorage.getItem('entries')) || [];
+
+        // Funktion, um Einträge anzuzeigen
+        function displayEntries() {
+            const entryList = document.getElementById('entryList');
+            entryList.innerHTML = '';  // Liste leeren
+            entries.forEach((entry) => {
+                const li = document.createElement('li');
+                li.textContent = `Von: ${entry.start}, Nach: ${entry.end}, Datum: ${entry.date}, Kilometer: ${entry.km}`;
+                entryList.appendChild(li);
+            });
+        }
+
+        // Zeige Einträge beim Laden der Seite an
+        displayEntries();
+
+        // Funktion zum Exportieren nach Excel
+        document.getElementById('exportToExcel').addEventListener('click', function() {
+            const csvContent = "data:text/csv;charset=utf-8,"
+                + "Von,Nach,Datum,Kilometer\n" // Header
+                + entries.map(e => `${e.start},${e.end},${e.date},${e.km}`).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "eintraege.csv");
+            document.body.appendChild(link); // Not necessary, but required for Firefox
+
+            link.click();
+            document.body.removeChild(link); // Link wieder entfernen
+        });
+
+        // Zurück zur Eingabe-Seite
+        document.getElementById('backToIndex').addEventListener('click', function() {
+            window.location.href = 'index.html'; // Weiterleitung zur index.html
+        });
+    </script>
+</body>
+</html>
