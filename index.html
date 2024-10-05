@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arzt-/Apotheken-Besuche speichern</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #121212; /* Dunkler Hintergrund */
+            color: #e0e0e0; /* Helle Schriftfarbe */
+            padding: 20px;
+        }
+
+        h1 {
+            color: #bb86fc; /* Helle lila Farbe */
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #1e1e1e; /* Dunkle Box für Inhalte */
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+
+        input, button {
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #444; /* Dunklerer Rahmen */
+            font-size: 16px;
+            width: calc(100% - 26px);
+            box-sizing: border-box;
+            background-color: #2a2a2a; /* Dunkles Eingabefeld */
+            color: #e0e0e0; /* Helle Schriftfarbe für Eingaben */
+        }
+
+        button {
+            background-color: #6200ee; /* Dunkles Blau */
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #3700b3; /* Dunkleres Blau beim Hover */
+        }
+
+        #clearEntries {
+            background-color: #f44336; /* Rot für löschen */
+        }
+
+        #clearEntries:hover {
+            background-color: #d32f2f; /* Dunkleres Rot beim Hover */
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #292929; /* Dunkle Hintergrundfarbe für Einträge */
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #444; /* Dunklerer Rahmen */
+            transition: transform 0.2s;
+        }
+
+        li:hover {
+            transform: scale(1.02);
+            border-color: #bb86fc; /* Lila beim Hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Arzt-/Apotheken-Besuche</h1>
+
+        <label for="startAddress">Startadresse:</label>
+        <input type="text" id="startAddress" placeholder="Startadresse" autocomplete="off"><br>
+
+        <label for="endAddress">Zieladresse:</label>
+        <input type="text" id="endAddress" placeholder="Zieladresse" autocomplete="off"><br>
+
+        <label for="visitDate">Datum:</label>
+        <input type="date" id="visitDate"><br>
+
+        <label for="kmInput">Kilometer gefahren:</label>
+        <input type="number" id="kmInput" placeholder="Kilometer gefahren" min="0"><br>
+
+        <button id="addEntry">Eintrag hinzufügen</button>
+        <button id="clearEntries">Einträge löschen</button>
+        <button id="viewEntries">Gespeicherte Einträge ansehen</button>
+
+        <h2>Gespeicherte Einträge:</h2>
+        <ul id="entryList"></ul>
+    </div>
+
+    <script>
+        let entries = JSON.parse(localStorage.getItem('entries')) || [];
+
+        // Funktion, um Einträge anzuzeigen
+        function displayEntries() {
+            const entryList = document.getElementById('entryList');
+            entryList.innerHTML = '';  // Liste leeren
+            entries.forEach((entry) => {
+                const li = document.createElement('li');
+                li.textContent = `Von: ${entry.start}, Nach: ${entry.end}, Datum: ${entry.date}, Kilometer: ${entry.km}`;
+                entryList.appendChild(li);
+            });
+        }
+
+        // Zeige Einträge beim Laden der Seite an
+        displayEntries();
+
+        // Funktion, um neue Einträge hinzuzufügen
+        document.getElementById('addEntry').addEventListener('click', function() {
+            const startAddress = document.getElementById('startAddress').value.trim();
+            const endAddress = document.getElementById('endAddress').value.trim();
+            const visitDate = document.getElementById('visitDate').value;
+            const kmInput = document.getElementById('kmInput').value;
+
+            if (startAddress && endAddress && visitDate && kmInput !== '') {
+                const entry = {
+                    start: startAddress,
+                    end: endAddress,
+                    date: visitDate,
+                    km: parseFloat(kmInput)
+                };
+
+                entries.push(entry);  // Füge den neuen Eintrag hinzu
+                localStorage.setItem('entries', JSON.stringify(entries));  // Speichere die Einträge in LocalStorage
+                displayEntries();  // Zeige die aktualisierten Einträge an
+
+                // Felder leeren
+                document.getElementById('startAddress').value = '';
+                document.getElementById('endAddress').value = '';
+                document.getElementById('visitDate').value = '';
+                document.getElementById('kmInput').value = '';
+            } else {
+                alert('Bitte alle Felder ausfüllen.');
+            }
+        });
+
+        // Funktion, um alle Einträge zu löschen
+        document.getElementById('clearEntries').addEventListener('click', function() {
+            localStorage.removeItem('entries');  // Lösche die Einträge aus LocalStorage
+            entries = [];  // Leere das Array
+            displayEntries();  // Aktualisiere die Anzeige
+        });
+
+        // Funktion, um die gespeicherten Einträge zu sehen
+        document.getElementById('viewEntries').addEventListener('click', function() {
+            window.location.href = 'entries.html'; // Weiterleitung zur entries.html
+        });
+    </script>
+</body>
+</html>
